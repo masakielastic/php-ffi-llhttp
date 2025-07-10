@@ -1,0 +1,51 @@
+{
+    "name": "masakielastic/php-ffi-llhttp",
+    "description": "PHP FFI bindings for llhttp - High-performance HTTP parser with object-oriented, event-driven API",
+    "type": "library",
+    "keywords": ["http", "parser", "ffi", "llhttp", "event-driven"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "masakielastic",
+            "email": "your-email@example.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "ext-ffi": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "phpstan/phpstan": "^1.10",
+        "squizlabs/php_codesniffer": "^3.7",
+        "phpstan/phpstan-strict-rules": "^1.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Llhttp\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Llhttp\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html tests/coverage",
+        "lint": "phpcs --standard=PSR12 src/ tests/",
+        "lint-fix": "phpcbf --standard=PSR12 src/ tests/",
+        "stan": "phpstan analyse src/ tests/ --level=8",
+        "check": [
+            "@lint",
+            "@stan",
+            "@test"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

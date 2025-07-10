@@ -1,0 +1,13 @@
+parameters:
+    level: 8
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+        # FFI related warnings that are expected
+        - '#FFI\\CData#'
+        - '#Call to method [a-zA-Z_]+\(\) on FFI\\CData#'
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
