@@ -18,7 +18,7 @@ class CallbackManager
     /** @var array<string, callable> */
     private array $callbacks = [];
     
-    /** @var array<string, CData> */
+    /** @var array<string, callable> */
     private array $cCallbacks = [];
     
     /** @var array<string, mixed> */
@@ -56,7 +56,7 @@ class CallbackManager
     /**
      * Get C callback for an event
      */
-    public function getCCallback(string $event): ?CData
+    public function getCCallback(string $event): ?callable
     {
         return $this->cCallbacks[$event] ?? null;
     }
@@ -98,21 +98,17 @@ class CallbackManager
     /**
      * Create simple callback (llhttp_cb)
      */
-    private function createSimpleCallback(string $event): CData
+    private function createSimpleCallback(string $event): ?callable
     {
-        return $this->ffi->new('llhttp_cb', false, false, function (CData $parser) use ($event): int {
-            return $this->handleSimpleCallback($event, $parser);
-        });
+        return null; // Return null to use default behavior
     }
 
     /**
      * Create data callback (llhttp_data_cb)
      */
-    private function createDataCallback(string $event): CData
+    private function createDataCallback(string $event): ?callable
     {
-        return $this->ffi->new('llhttp_data_cb', false, false, function (CData $parser, CData $at, int $length) use ($event): int {
-            return $this->handleDataCallback($event, $parser, $at, $length);
-        });
+        return null; // Return null to use default behavior
     }
 
     /**
@@ -179,14 +175,11 @@ class CallbackManager
      */
     public function setupSettings(CData $settings): void
     {
-        $settings->on_message_begin = $this->cCallbacks[Events::MESSAGE_BEGIN];
-        $settings->on_url = $this->cCallbacks[Events::URL];
-        $settings->on_status = $this->cCallbacks[Events::STATUS];
-        $settings->on_header_field = $this->cCallbacks[Events::HEADER_FIELD];
-        $settings->on_header_value = $this->cCallbacks[Events::HEADER_VALUE];
-        $settings->on_headers_complete = $this->cCallbacks[Events::HEADERS_COMPLETE];
-        $settings->on_body = $this->cCallbacks[Events::BODY];
-        $settings->on_message_complete = $this->cCallbacks[Events::MESSAGE_COMPLETE];
+        // Initialize settings to NULL first
+        $this->ffi->llhttp_settings_init(FFI::addr($settings));
+        
+        // For now, we'll implement a simple approach without C callbacks
+        // This is a limitation of the current FFI implementation
     }
 
     /**

@@ -72,6 +72,7 @@ class Binding
     private function detectLibraryPath(): string
     {
         $candidates = [
+            '/home/masakielastic/projects/test/llhttp/build/libllhttp.so',
             'libllhttp.so',
             'libllhttp.so.0',
             '/usr/local/lib/libllhttp.so',
@@ -110,7 +111,7 @@ class Binding
      */
     public function initParser(CData $parser, int $type, CData $settings): void
     {
-        $this->ffi->llhttp_init($parser, $type, FFI::addr($settings));
+        $this->ffi->llhttp_init(FFI::addr($parser), $type, FFI::addr($settings));
     }
 
     /**
@@ -118,7 +119,7 @@ class Binding
      */
     public function execute(CData $parser, string $data): int
     {
-        return $this->ffi->llhttp_execute($parser, $data, strlen($data));
+        return $this->ffi->llhttp_execute(FFI::addr($parser), $data, strlen($data));
     }
 
     /**
@@ -126,7 +127,7 @@ class Binding
      */
     public function finish(CData $parser): int
     {
-        return $this->ffi->llhttp_finish($parser);
+        return $this->ffi->llhttp_finish(FFI::addr($parser));
     }
 
     /**
@@ -134,7 +135,7 @@ class Binding
      */
     public function resume(CData $parser): void
     {
-        $this->ffi->llhttp_resume($parser);
+        $this->ffi->llhttp_resume(FFI::addr($parser));
     }
 
     /**
@@ -142,7 +143,7 @@ class Binding
      */
     public function getErrorCode(CData $parser): int
     {
-        return $this->ffi->llhttp_get_errno($parser);
+        return $this->ffi->llhttp_get_errno(FFI::addr($parser));
     }
 
     /**
@@ -150,7 +151,7 @@ class Binding
      */
     public function getHttpMajor(CData $parser): int
     {
-        return $this->ffi->llhttp_get_http_major($parser);
+        return $this->ffi->llhttp_get_http_major(FFI::addr($parser));
     }
 
     /**
@@ -158,7 +159,7 @@ class Binding
      */
     public function getHttpMinor(CData $parser): int
     {
-        return $this->ffi->llhttp_get_http_minor($parser);
+        return $this->ffi->llhttp_get_http_minor(FFI::addr($parser));
     }
 
     /**
@@ -166,7 +167,7 @@ class Binding
      */
     public function getMethod(CData $parser): int
     {
-        return $this->ffi->llhttp_get_method($parser);
+        return $this->ffi->llhttp_get_method(FFI::addr($parser));
     }
 
     /**
@@ -174,7 +175,7 @@ class Binding
      */
     public function getStatusCode(CData $parser): int
     {
-        return $this->ffi->llhttp_get_status_code($parser);
+        return $this->ffi->llhttp_get_status_code(FFI::addr($parser));
     }
 
     /**
@@ -182,7 +183,7 @@ class Binding
      */
     public function shouldKeepAlive(CData $parser): bool
     {
-        return $this->ffi->llhttp_should_keep_alive($parser) !== 0;
+        return $this->ffi->llhttp_should_keep_alive(FFI::addr($parser)) !== 0;
     }
 
     /**
@@ -190,7 +191,7 @@ class Binding
      */
     public function messageNeedsEof(CData $parser): bool
     {
-        return $this->ffi->llhttp_message_needs_eof($parser) !== 0;
+        return $this->ffi->llhttp_message_needs_eof(FFI::addr($parser)) !== 0;
     }
 
     /**
@@ -198,7 +199,7 @@ class Binding
      */
     public function getErrorReason(CData $parser): ?string
     {
-        $reason = $this->ffi->llhttp_get_error_reason($parser);
+        $reason = $this->ffi->llhttp_get_error_reason(FFI::addr($parser));
         return $reason !== null ? FFI::string($reason) : null;
     }
 
@@ -216,8 +217,58 @@ class Binding
      */
     public function getMethodName(int $method): string
     {
-        $name = $this->ffi->llhttp_method_name($method);
-        return FFI::string($name);
+        // Simple method name mapping since FFI function is not working
+        $methodNames = [
+            0 => 'DELETE',
+            1 => 'GET',
+            2 => 'HEAD', 
+            3 => 'POST',
+            4 => 'PUT',
+            5 => 'CONNECT',
+            6 => 'OPTIONS',
+            7 => 'TRACE',
+            8 => 'COPY',
+            9 => 'LOCK',
+            10 => 'MKCOL',
+            11 => 'MOVE',
+            12 => 'PROPFIND',
+            13 => 'PROPPATCH',
+            14 => 'SEARCH',
+            15 => 'UNLOCK',
+            16 => 'BIND',
+            17 => 'REBIND',
+            18 => 'UNBIND',
+            19 => 'ACL',
+            20 => 'REPORT',
+            21 => 'MKACTIVITY',
+            22 => 'CHECKOUT',
+            23 => 'MERGE',
+            24 => 'MSEARCH',
+            25 => 'NOTIFY',
+            26 => 'SUBSCRIBE',
+            27 => 'UNSUBSCRIBE',
+            28 => 'PATCH',
+            29 => 'PURGE',
+            30 => 'MKCALENDAR',
+            31 => 'LINK',
+            32 => 'UNLINK',
+            33 => 'SOURCE',
+            34 => 'PRI',
+            35 => 'DESCRIBE',
+            36 => 'ANNOUNCE',
+            37 => 'SETUP',
+            38 => 'PLAY',
+            39 => 'PAUSE',
+            40 => 'TEARDOWN',
+            41 => 'GET_PARAMETER',
+            42 => 'SET_PARAMETER',
+            43 => 'REDIRECT',
+            44 => 'RECORD',
+            45 => 'FLUSH',
+            46 => 'QUERY'
+        ];
+        
+        return $methodNames[$method] ?? 'UNKNOWN';
     }
 
     /**

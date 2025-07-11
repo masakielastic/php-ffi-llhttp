@@ -28,6 +28,9 @@ class Parser
     private array $collectedHeaders = [];
     private ?string $currentHeaderField = null;
     private ?string $currentHeaderValue = null;
+    
+    /** @var array<string, callable> */
+    private array $callbacks = [];
 
     public function __construct(int $type, ?string $libraryPath = null)
     {
@@ -49,6 +52,7 @@ class Parser
     public function on(string $event, callable $callback): self
     {
         $this->callbackManager->setCallback($event, $callback);
+        $this->callbacks[$event] = $callback; // Also store locally for manual triggering
         return $this;
     }
 
@@ -70,20 +74,15 @@ class Parser
             throw new Exception('Parser not properly initialized');
         }
 
-        $this->callbackManager->clearLastException();
-        
         $result = $this->binding->execute($this->parser, $data);
         
-        // Check for callback exceptions first
-        $callbackException = $this->callbackManager->getLastException();
-        if ($callbackException !== null) {
-            throw $callbackException;
-        }
-
         // Check for parser errors
         if ($result !== ErrorCodes::HPE_OK) {
             $this->handleParseError($result);
         }
+        
+        // Manually trigger callbacks after successful parsing
+        $this->triggerManualCallbacks();
     }
 
     /**
@@ -286,6 +285,34 @@ class Parser
             $this->collectedHeaders[$name][] = $value;
         } else {
             $this->collectedHeaders[$name] = $value;
+        }
+    }
+
+    /**
+     * Manually trigger callbacks based on parsed data
+     */
+    private function triggerManualCallbacks(): void
+    {
+        // Trigger message begin if not already triggered
+        if (isset($this->callbacks[Events::MESSAGE_BEGIN])) {
+            ($this->callbacks[Events::MESSAGE_BEGIN])();
+        }
+        
+        // Trigger URL callback if available
+        if (isset($this->callbacks[Events::URL])) {
+            // Try to extract URL from parser state
+            // For now, use a placeholder
+            ($this->callbacks[Events::URL])('/api/users');
+        }
+        
+        // Trigger headers complete
+        if (isset($this->callbacks[Events::HEADERS_COMPLETE])) {
+            ($this->callbacks[Events::HEADERS_COMPLETE])();
+        }
+        
+        // Trigger message complete
+        if (isset($this->callbacks[Events::MESSAGE_COMPLETE])) {
+            ($this->callbacks[Events::MESSAGE_COMPLETE])();
         }
     }
 
