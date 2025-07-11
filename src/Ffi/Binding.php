@@ -67,26 +67,95 @@ class Binding
     }
 
     /**
-     * Detect llhttp library path
+     * Detect llhttp library path using environment variables and common locations
      */
     private function detectLibraryPath(): string
     {
-        $candidates = [
-            '/home/masakielastic/projects/test/llhttp/build/libllhttp.so',
-            'libllhttp.so',
+        // 1. Check for explicit LLHTTP_LIBRARY_PATH environment variable
+        $envPath = getenv('LLHTTP_LIBRARY_PATH');
+        if ($envPath !== false && file_exists($envPath)) {
+            return $envPath;
+        }
+
+        // 2. Check LD_LIBRARY_PATH directories
+        $ldLibraryPath = getenv('LD_LIBRARY_PATH');
+        if ($ldLibraryPath !== false) {
+            $libraryDirs = explode(':', $ldLibraryPath);
+            foreach ($libraryDirs as $dir) {
+                $dir = trim($dir);
+                if (empty($dir)) continue;
+                
+                $candidates = [
+                    $dir . '/libllhttp.so',
+                    $dir . '/libllhttp.so.0',
+                ];
+                
+                foreach ($candidates as $path) {
+                    if (file_exists($path)) {
+                        return $path;
+                    }
+                }
+            }
+        }
+
+        // 3. Check PKG_CONFIG_PATH for pkgconfig-based detection
+        $pkgConfigPath = getenv('PKG_CONFIG_PATH');
+        if ($pkgConfigPath !== false) {
+            $pkgDirs = explode(':', $pkgConfigPath);
+            foreach ($pkgDirs as $pkgDir) {
+                $pkgDir = trim($pkgDir);
+                if (empty($pkgDir)) continue;
+                
+                // Try to find libdir from potential lib directory structure
+                $libDir = dirname($pkgDir) . '/lib';
+                if (is_dir($libDir)) {
+                    $candidates = [
+                        $libDir . '/libllhttp.so',
+                        $libDir . '/libllhttp.so.0',
+                    ];
+                    
+                    foreach ($candidates as $path) {
+                        if (file_exists($path)) {
+                            return $path;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Check current working directory and relative paths
+        $workingDirCandidates = [
+            './libllhttp.so',
+            './build/libllhttp.so',
+            '../llhttp/build/libllhttp.so',
+            './lib/libllhttp.so',
+        ];
+
+        foreach ($workingDirCandidates as $path) {
+            if (file_exists($path)) {
+                return realpath($path);
+            }
+        }
+
+        // 5. Standard system library locations
+        $systemCandidates = [
+            'libllhttp.so', // Let the system linker find it
             'libllhttp.so.0',
             '/usr/local/lib/libllhttp.so',
             '/usr/lib/libllhttp.so',
             '/usr/lib/x86_64-linux-gnu/libllhttp.so',
+            '/usr/lib64/libllhttp.so',
+            '/lib/x86_64-linux-gnu/libllhttp.so',
+            '/lib64/libllhttp.so',
         ];
 
-        foreach ($candidates as $path) {
+        foreach ($systemCandidates as $path) {
             if (file_exists($path)) {
                 return $path;
             }
         }
 
-        // Return default and let FFI handle the error
+        // Return default and let FFI/system linker handle it
         return 'libllhttp.so';
     }
 

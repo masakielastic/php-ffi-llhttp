@@ -35,6 +35,43 @@ npm run build
 # build/libllhttp.so を適切な場所に配置
 ```
 
+### ライブラリパスの設定
+
+llhttpライブラリの場所は以下の方法で指定できます（優先度順）：
+
+1. **環境変数 `LLHTTP_LIBRARY_PATH`**（推奨）
+   ```bash
+   export LLHTTP_LIBRARY_PATH=/path/to/libllhttp.so
+   php your_script.php
+   ```
+
+2. **`LD_LIBRARY_PATH` 環境変数**
+   ```bash
+   export LD_LIBRARY_PATH=/path/to/lib:$LD_LIBRARY_PATH
+   php your_script.php
+   ```
+
+3. **`PKG_CONFIG_PATH` からの自動検出**
+   ```bash
+   export PKG_CONFIG_PATH=/path/to/pkgconfig:$PKG_CONFIG_PATH
+   ```
+
+4. **相対パス**（開発時）
+   - `./libllhttp.so`
+   - `./build/libllhttp.so`
+   - `../llhttp/build/libllhttp.so`
+
+5. **システム標準パス**
+   - `/usr/local/lib/libllhttp.so`
+   - `/usr/lib/libllhttp.so`
+   - その他標準的なライブラリディレクトリ
+
+コード内で直接指定することも可能です：
+
+```php
+$parser = new Parser(Parser::TYPE_REQUEST, '/custom/path/to/libllhttp.so');
+```
+
 ## 基本的な使い方
 
 ### HTTPリクエストの解析

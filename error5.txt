@@ -1,0 +1,18 @@
+masakielastic@penguin:~/projects/test$ php test.php
+PHP Fatal error:  Uncaught FFI\ParserException: unexpected '<STRING>' at line 12 in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php:59
+Stack trace:
+#0 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php(59): FFI::cdef()
+#1 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php(22): Llhttp\Ffi\Binding->initializeFfi()
+#2 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php(31): Llhttp\Ffi\Binding->__construct()
+#3 /home/masakielastic/projects/php-ffi-llhttp/src/Parser.php(39): Llhttp\Ffi\Binding::getInstance()
+#4 /home/masakielastic/projects/test/test.php(7): Llhttp\Parser->__construct()
+#5 {main}
+
+Next RuntimeException: Failed to initialize FFI with llhttp library: unexpected '<STRING>' at line 12 in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php:61
+Stack trace:
+#0 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php(22): Llhttp\Ffi\Binding->initializeFfi()
+#1 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php(31): Llhttp\Ffi\Binding->__construct()
+#2 /home/masakielastic/projects/php-ffi-llhttp/src/Parser.php(39): Llhttp\Ffi\Binding::getInstance()
+#3 /home/masakielastic/projects/test/test.php(7): Llhttp\Parser->__construct()
+#4 {main}
+  thrown in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php on line 61

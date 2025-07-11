@@ -1,0 +1,9 @@
+PHP Fatal error:  Uncaught TypeError: FFI::new(): Argument #2 ($owned) must be of type bool, Closure given in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php:103
+Stack trace:
+#0 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php(103): FFI->new()
+#1 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php(86): Llhttp\Ffi\CallbackManager->createSimpleCallback()
+#2 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php(33): Llhttp\Ffi\CallbackManager->initializeCCallbacks()
+#3 /home/masakielastic/projects/php-ffi-llhttp/src/Parser.php(40): Llhttp\Ffi\CallbackManager->__construct()
+#4 /home/masakielastic/projects/test/test.php(7): Llhttp\Parser->__construct()
+#5 {main}
+  thrown in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php on line 103

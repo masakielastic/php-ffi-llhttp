@@ -1,0 +1,58 @@
+masakielastic@penguin:~/projects/test$ pwd
+/home/masakielastic/projects/test
+masakielastic@penguin:~/projects/test$ echo $LD_LIBRARY_PATH
+/home/masakielastic/projects/test/llhttp/build
+masakielastic@penguin:~/projects/test$ ls llhttp/build
+c  libllhttp.a  libllhttp.so  llhttp.h  native
+masakielastic@penguin:~/projects/test$ ls
+composer.json  composer.lock  llhttp  test.php  vendor
+masakielastic@penguin:~/projects/test$ cat test.php
+<?php
+require "vendor/autoload.php";
+
+use Llhttp\Parser;
+use Llhttp\Events;
+
+$parser = new Parser(Parser::TYPE_REQUEST);
+
+$parser->on(Events::MESSAGE_BEGIN, function () {
+    echo "解析開始\n";
+});
+
+$parser->on(Events::URL, function (string $url) {
+    echo "URL: {$url}\n";
+});
+
+$parser->on(Events::HEADERS_COMPLETE, function () use ($parser) {
+    echo "ヘッダー解析完了\n";
+    echo "メソッド: " . $parser->getMethodName() . "\n";
+    foreach ($parser->getHeaders() as $name => $value) {
+        echo "{$name}: {$value}\n";
+    }
+});
+
+$parser->on(Events::BODY, function (string $chunk) {
+    echo "ボディ: {$chunk}\n";
+});
+
+$parser->on(Events::MESSAGE_COMPLETE, function () {
+    echo "解析完了\n";
+});
+
+$request = "GET /api/users HTTP/1.1\r\n" .
+           "Host: example.com\r\n" .
+           "Content-Length: 0\r\n" .
+           "\r\n";
+
+$parser->execute($request);
+$parser->finish();
+masakielastic@penguin:~/projects/test$ php test.php
+PHP Fatal error:  Uncaught ArgumentCountError: FFI::new() expects at most 3 arguments, 4 given in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php:103
+Stack trace:
+#0 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php(103): FFI->new()
+#1 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php(86): Llhttp\Ffi\CallbackManager->createSimpleCallback()
+#2 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php(33): Llhttp\Ffi\CallbackManager->initializeCCallbacks()
+#3 /home/masakielastic/projects/php-ffi-llhttp/src/Parser.php(40): Llhttp\Ffi\CallbackManager->__construct()
+#4 /home/masakielastic/projects/test/test.php(7): Llhttp\Parser->__construct()
+#5 {main}
+  thrown in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php on line 103

@@ -1,0 +1,15 @@
+masakielastic@penguin:~/projects/test$ php test.php
+PHP Fatal error:  Uncaught FFI\ParserException: Incomplete struct "llhttp__internal_t" at line 1 in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php:97
+Stack trace:
+#0 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php(97): FFI->new()
+#1 /home/masakielastic/projects/php-ffi-llhttp/src/Parser.php(223): Llhttp\Ffi\Binding->createParser()
+#2 /home/masakielastic/projects/php-ffi-llhttp/src/Parser.php(42): Llhttp\Parser->initializeParser()
+#3 /home/masakielastic/projects/test/test.php(7): Llhttp\Parser->__construct()
+#4 {main}
+  thrown in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php on line 97
+masakielastic@penguin:~/projects/test$ php -v
+PHP 8.4.10 (cli) (built: Jul  3 2025 12:45:15) (NTS)
+Copyright (c) The PHP Group
+Built by Debian
+Zend Engine v4.4.10, Copyright (c) Zend Technologies
+    with Zend OPcache v8.4.10, Copyright (c), by Zend Technologies

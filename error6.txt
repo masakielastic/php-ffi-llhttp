@@ -1,0 +1,8 @@
+PHP Fatal error:  Uncaught FFI\Exception: Passing incompatible argument 1 of C function 'llhttp_init', expecting 'struct llhttp__internal_s*', found 'struct llhttp__internal_s' in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php:114
+Stack trace:
+#0 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php(114): FFI->llhttp_init()
+#1 /home/masakielastic/projects/php-ffi-llhttp/src/Parser.php(227): Llhttp\Ffi\Binding->initParser()
+#2 /home/masakielastic/projects/php-ffi-llhttp/src/Parser.php(42): Llhttp\Parser->initializeParser()
+#3 /home/masakielastic/projects/test/test.php(7): Llhttp\Parser->__construct()
+#4 {main}
+  thrown in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php on line 114

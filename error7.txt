@@ -1,0 +1,10 @@
+解析開始
+PHP Warning:  Uncaught TypeError: Llhttp\Ffi\CallbackManager::{closure:Llhttp\Ffi\CallbackManager::createDataCallback():113}(): Argument #2 ($at) must be of type FFI\CData, string given in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php:113
+Stack trace:
+#0 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php(122): Llhttp\Ffi\CallbackManager->{closure:Llhttp\Ffi\CallbackManager::createDataCallback():113}()
+#1 /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php(122): FFI->llhttp_execute()
+#2 /home/masakielastic/projects/php-ffi-llhttp/src/Parser.php(75): Llhttp\Ffi\Binding->execute()
+#3 /home/masakielastic/projects/test/test.php(38): Llhttp\Parser->execute()
+#4 {main}
+  thrown in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/CallbackManager.php on line 113
+PHP Fatal error:  Throwing from FFI callbacks is not allowed in /home/masakielastic/projects/php-ffi-llhttp/src/Ffi/Binding.php on line 122
