@@ -2,6 +2,8 @@
 
 高性能なHTTPパーサーライブラリ「llhttp」のPHP FFIバインディング。オブジェクト指向でイベント駆動型のAPIを提供します。
 
+> **注意**: このライブラリは `Llhttp\Ffi` 名前空間を使用しており、別のPHP拡張機能プロジェクトとの互換性を保つため、メインの `Llhttp` 名前空間は使用していません。
+
 ## 特徴
 
 - **高性能**: C言語で書かれたllhttpライブラリを使用
@@ -59,6 +61,7 @@ llhttpライブラリの場所は以下の方法で指定できます（優先�
 4. **相対パス**（開発時）
    - `./libllhttp.so`
    - `./build/libllhttp.so`
+   - `./llhttp/build/libllhttp.so`
    - `../llhttp/build/libllhttp.so`
 
 5. **システム標準パス**
@@ -78,8 +81,8 @@ $parser = new Parser(Parser::TYPE_REQUEST, '/custom/path/to/libllhttp.so');
 
 ```php
 <?php
-use Llhttp\Parser;
-use Llhttp\Events;
+use Llhttp\Ffi\Parser;
+use Llhttp\Ffi\Events;
 
 $parser = new Parser(Parser::TYPE_REQUEST);
 
@@ -120,8 +123,8 @@ $parser->finish();
 
 ```php
 <?php
-use Llhttp\Parser;
-use Llhttp\Events;
+use Llhttp\Ffi\Parser;
+use Llhttp\Ffi\Events;
 
 $parser = new Parser(Parser::TYPE_RESPONSE);
 
@@ -209,7 +212,7 @@ $parser->finish();
 ```php
 try {
     $parser->execute($invalidHttpData);
-} catch (\Llhttp\Exception $e) {
+} catch (\Llhttp\Ffi\Exception $e) {
     echo "パーサーエラー: " . $e->getMessage() . "\n";
     echo "エラーコード: " . $e->getLlhttpErrorCode() . "\n";
     
