@@ -217,58 +217,33 @@ class Binding
      */
     public function getMethodName(int $method): string
     {
-        // Simple method name mapping since FFI function is not working
-        $methodNames = [
-            0 => 'DELETE',
-            1 => 'GET',
-            2 => 'HEAD', 
-            3 => 'POST',
-            4 => 'PUT',
-            5 => 'CONNECT',
-            6 => 'OPTIONS',
-            7 => 'TRACE',
-            8 => 'COPY',
-            9 => 'LOCK',
-            10 => 'MKCOL',
-            11 => 'MOVE',
-            12 => 'PROPFIND',
-            13 => 'PROPPATCH',
-            14 => 'SEARCH',
-            15 => 'UNLOCK',
-            16 => 'BIND',
-            17 => 'REBIND',
-            18 => 'UNBIND',
-            19 => 'ACL',
-            20 => 'REPORT',
-            21 => 'MKACTIVITY',
-            22 => 'CHECKOUT',
-            23 => 'MERGE',
-            24 => 'MSEARCH',
-            25 => 'NOTIFY',
-            26 => 'SUBSCRIBE',
-            27 => 'UNSUBSCRIBE',
-            28 => 'PATCH',
-            29 => 'PURGE',
-            30 => 'MKCALENDAR',
-            31 => 'LINK',
-            32 => 'UNLINK',
-            33 => 'SOURCE',
-            34 => 'PRI',
-            35 => 'DESCRIBE',
-            36 => 'ANNOUNCE',
-            37 => 'SETUP',
-            38 => 'PLAY',
-            39 => 'PAUSE',
-            40 => 'TEARDOWN',
-            41 => 'GET_PARAMETER',
-            42 => 'SET_PARAMETER',
-            43 => 'REDIRECT',
-            44 => 'RECORD',
-            45 => 'FLUSH',
-            46 => 'QUERY'
-        ];
-        
-        return $methodNames[$method] ?? 'UNKNOWN';
+        try {
+            $name = $this->ffi->llhttp_method_name($method);
+            // llhttp_method_name は直接文字列を返すことが判明
+            if (is_string($name)) {
+                return $name;
+            }
+            // CData の場合は FFI::string() を使用
+            if ($name !== null && is_object($name)) {
+                return FFI::string($name);
+            }
+            return 'UNKNOWN';
+        } catch (\Throwable $e) {
+            // フォールバック: 手動マッピング
+            $methodNames = [
+                0 => 'DELETE', 1 => 'GET', 2 => 'HEAD', 3 => 'POST', 4 => 'PUT',
+                5 => 'CONNECT', 6 => 'OPTIONS', 7 => 'TRACE', 8 => 'COPY', 9 => 'LOCK',
+                10 => 'MKCOL', 11 => 'MOVE', 12 => 'PROPFIND', 13 => 'PROPPATCH', 14 => 'SEARCH',
+                15 => 'UNLOCK', 16 => 'BIND', 17 => 'REBIND', 18 => 'UNBIND', 19 => 'ACL',
+                20 => 'REPORT', 21 => 'MKACTIVITY', 22 => 'CHECKOUT', 23 => 'MERGE', 24 => 'MSEARCH',
+                25 => 'NOTIFY', 26 => 'SUBSCRIBE', 27 => 'UNSUBSCRIBE', 28 => 'PATCH', 29 => 'PURGE',
+                30 => 'MKCALENDAR', 31 => 'LINK', 32 => 'UNLINK', 33 => 'SOURCE', 34 => 'PRI',
+                35 => 'DESCRIBE', 36 => 'ANNOUNCE', 37 => 'SETUP', 38 => 'PLAY', 39 => 'PAUSE',
+                40 => 'TEARDOWN', 41 => 'GET_PARAMETER', 42 => 'SET_PARAMETER', 43 => 'REDIRECT',
+                44 => 'RECORD', 45 => 'FLUSH', 46 => 'QUERY'
+            ];
+            return $methodNames[$method] ?? 'UNKNOWN';
+        }
     }
 
     /**
