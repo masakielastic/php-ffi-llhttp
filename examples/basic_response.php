@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Llhttp\Parser;
-use Llhttp\Events;
+use Llhttp\Ffi\Parser;
+use Llhttp\Ffi\Events;
 
 // Create HTTP response parser
 $parser = new Parser(Parser::TYPE_RESPONSE);
@@ -76,7 +76,7 @@ try {
     echo "\nParsing completed successfully!\n";
 } catch (\Throwable $e) {
     echo "Error: " . $e->getMessage() . "\n";
-    if ($e instanceof \Llhttp\Exception) {
+    if ($e instanceof \Llhttp\Ffi\Exception) {
         echo "Error Code: " . $e->getLlhttpErrorCode() . "\n";
     }
 }

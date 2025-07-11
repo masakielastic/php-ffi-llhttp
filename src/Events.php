@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Llhttp;
+namespace Llhttp\Ffi;
 
 /**
  * Event name constants for HTTP parser callbacks

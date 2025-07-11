@@ -22,12 +22,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Llhttp\\": "src/"
+            "Llhttp\\Ffi\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Llhttp\\Tests\\": "tests/"
+            "Llhttp\\Ffi\\Tests\\": "tests/"
         }
     },
     "scripts": {

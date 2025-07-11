@@ -6,7 +6,7 @@ namespace Llhttp\Ffi;
 
 use FFI;
 use FFI\CData;
-use Llhttp\Exception;
+use Llhttp\Ffi\Exception;
 use RuntimeException;
 
 /**
@@ -40,7 +40,7 @@ class Binding
     private function initializeFfi(?string $libraryPath): void
     {
         $headerFile = __DIR__ . '/llhttp.h';
-        
+
         if (!file_exists($headerFile)) {
             throw new RuntimeException("FFI header file not found: {$headerFile}");
         }
@@ -83,13 +83,15 @@ class Binding
             $libraryDirs = explode(':', $ldLibraryPath);
             foreach ($libraryDirs as $dir) {
                 $dir = trim($dir);
-                if (empty($dir)) continue;
-                
+                if (empty($dir)) {
+                    continue;
+                }
+
                 $candidates = [
                     $dir . '/libllhttp.so',
                     $dir . '/libllhttp.so.0',
                 ];
-                
+
                 foreach ($candidates as $path) {
                     if (file_exists($path)) {
                         return $path;
@@ -104,8 +106,10 @@ class Binding
             $pkgDirs = explode(':', $pkgConfigPath);
             foreach ($pkgDirs as $pkgDir) {
                 $pkgDir = trim($pkgDir);
-                if (empty($pkgDir)) continue;
-                
+                if (empty($pkgDir)) {
+                    continue;
+                }
+
                 // Try to find libdir from potential lib directory structure
                 $libDir = dirname($pkgDir) . '/lib';
                 if (is_dir($libDir)) {
@@ -113,7 +117,7 @@ class Binding
                         $libDir . '/libllhttp.so',
                         $libDir . '/libllhttp.so.0',
                     ];
-                    
+
                     foreach ($candidates as $path) {
                         if (file_exists($path)) {
                             return $path;
@@ -127,6 +131,7 @@ class Binding
         $workingDirCandidates = [
             './libllhttp.so',
             './build/libllhttp.so',
+            './llhttp/build/libllhttp.so',
             '../llhttp/build/libllhttp.so',
             './lib/libllhttp.so',
         ];
@@ -269,7 +274,14 @@ class Binding
     public function getErrorReason(CData $parser): ?string
     {
         $reason = $this->ffi->llhttp_get_error_reason(FFI::addr($parser));
-        return $reason !== null ? FFI::string($reason) : null;
+        if ($reason === null) {
+            return null;
+        }
+        // Check if it's already a string or needs FFI::string conversion
+        if (is_string($reason)) {
+            return $reason;
+        }
+        return FFI::string($reason);
     }
 
     /**

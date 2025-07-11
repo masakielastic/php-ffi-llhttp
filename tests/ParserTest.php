@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Llhttp\Tests;
+namespace Llhttp\Ffi\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Llhttp\Parser;
-use Llhttp\Events;
-use Llhttp\Exception;
+use Llhttp\Ffi\Parser;
+use Llhttp\Ffi\Events;
+use Llhttp\Ffi\Exception;
 
 class ParserTest extends TestCase
 {
@@ -33,7 +33,7 @@ class ParserTest extends TestCase
     {
         $parser = new Parser(Parser::TYPE_REQUEST);
         $called = false;
-        
+
         $parser->on(Events::MESSAGE_BEGIN, function () use (&$called) {
             $called = true;
         });
@@ -46,10 +46,11 @@ class ParserTest extends TestCase
     public function testCanRemoveCallbacks(): void
     {
         $parser = new Parser(Parser::TYPE_REQUEST);
-        
-        $parser->on(Events::MESSAGE_BEGIN, function () {});
+
+        $parser->on(Events::MESSAGE_BEGIN, function () {
+        });
         $parser->off(Events::MESSAGE_BEGIN);
-        
+
         // Test that removal doesn't throw
         $this->assertTrue(true);
     }
@@ -57,12 +58,12 @@ class ParserTest extends TestCase
     public function testPauseAndResume(): void
     {
         $parser = new Parser(Parser::TYPE_REQUEST);
-        
+
         $this->assertFalse($parser->isPaused());
-        
+
         $parser->pause();
         $this->assertTrue($parser->isPaused());
-        
+
         $parser->resume();
         $this->assertFalse($parser->isPaused());
     }
@@ -70,10 +71,10 @@ class ParserTest extends TestCase
     public function testReset(): void
     {
         $parser = new Parser(Parser::TYPE_REQUEST);
-        
+
         $parser->pause();
         $this->assertTrue($parser->isPaused());
-        
+
         $parser->reset();
         $this->assertFalse($parser->isPaused());
     }
@@ -81,29 +82,29 @@ class ParserTest extends TestCase
     public function testSimpleRequestParsing(): void
     {
         $parser = new Parser(Parser::TYPE_REQUEST);
-        
+
         $messageBeginCalled = false;
         $messageCompleteCalled = false;
         $urlReceived = '';
-        
+
         $parser->on(Events::MESSAGE_BEGIN, function () use (&$messageBeginCalled) {
             $messageBeginCalled = true;
         });
-        
+
         $parser->on(Events::URL, function (string $url) use (&$urlReceived) {
             $urlReceived .= $url;
         });
-        
+
         $parser->on(Events::MESSAGE_COMPLETE, function () use (&$messageCompleteCalled) {
             $messageCompleteCalled = true;
         });
 
         $request = "GET /test HTTP/1.1\r\nHost: example.com\r\n\r\n";
-        
+
         try {
             $parser->execute($request);
             $parser->finish();
-            
+
             $this->assertTrue($messageBeginCalled);
             $this->assertTrue($messageCompleteCalled);
             $this->assertEquals('/test', $urlReceived);
@@ -118,29 +119,29 @@ class ParserTest extends TestCase
     public function testSimpleResponseParsing(): void
     {
         $parser = new Parser(Parser::TYPE_RESPONSE);
-        
+
         $messageBeginCalled = false;
         $messageCompleteCalled = false;
         $statusReceived = '';
-        
+
         $parser->on(Events::MESSAGE_BEGIN, function () use (&$messageBeginCalled) {
             $messageBeginCalled = true;
         });
-        
+
         $parser->on(Events::STATUS, function (string $status) use (&$statusReceived) {
             $statusReceived .= $status;
         });
-        
+
         $parser->on(Events::MESSAGE_COMPLETE, function () use (&$messageCompleteCalled) {
             $messageCompleteCalled = true;
         });
 
         $response = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
-        
+
         try {
             $parser->execute($response);
             $parser->finish();
-            
+
             $this->assertTrue($messageBeginCalled);
             $this->assertTrue($messageCompleteCalled);
             $this->assertEquals('OK', $statusReceived);
@@ -156,9 +157,9 @@ class ParserTest extends TestCase
     public function testHeaderCollection(): void
     {
         $parser = new Parser(Parser::TYPE_REQUEST);
-        
+
         $headersComplete = false;
-        
+
         $parser->on(Events::HEADERS_COMPLETE, function () use (&$headersComplete) {
             $headersComplete = true;
         });
@@ -168,12 +169,12 @@ class ParserTest extends TestCase
                    "User-Agent: Test\r\n" .
                    "Accept: */*\r\n" .
                    "\r\n";
-        
+
         try {
             $parser->execute($request);
-            
+
             $this->assertTrue($headersComplete);
-            
+
             $headers = $parser->getHeaders();
             $this->assertArrayHasKey('host', $headers);
             $this->assertArrayHasKey('user-agent', $headers);

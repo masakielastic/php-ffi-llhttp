@@ -6,9 +6,9 @@ namespace Llhttp\Ffi;
 
 use FFI;
 use FFI\CData;
-use Llhttp\Events;
-use Llhttp\Exception;
-use Llhttp\ErrorCodes;
+use Llhttp\Ffi\Events;
+use Llhttp\Ffi\Exception;
+use Llhttp\Ffi\ErrorCodes;
 
 /**
  * Manages callbacks between C llhttp and PHP
@@ -17,13 +17,13 @@ class CallbackManager
 {
     /** @var array<string, callable> */
     private array $callbacks = [];
-    
+
     /** @var array<string, callable> */
     private array $cCallbacks = [];
-    
+
     /** @var array<string, mixed> */
     private array $callbackData = [];
-    
+
     private ?Exception $lastException = null;
     private FFI $ffi;
 
@@ -122,7 +122,7 @@ class CallbackManager
 
         try {
             $result = ($this->callbacks[$event])();
-            
+
             // Handle special return values for headers_complete
             if ($event === Events::HEADERS_COMPLETE) {
                 if ($result === 1) {
@@ -131,7 +131,7 @@ class CallbackManager
                     return 2; // Skip body and pause
                 }
             }
-            
+
             return $result === false ? ErrorCodes::HPE_USER : ErrorCodes::HPE_OK;
         } catch (\Throwable $e) {
             $this->lastException = new Exception(
@@ -156,7 +156,7 @@ class CallbackManager
         try {
             // Convert C data to PHP string
             $data = FFI::string($at, $length);
-            
+
             $result = ($this->callbacks[$event])($data);
             return $result === false ? ErrorCodes::HPE_USER : ErrorCodes::HPE_OK;
         } catch (\Throwable $e) {
@@ -177,7 +177,7 @@ class CallbackManager
     {
         // Initialize settings to NULL first
         $this->ffi->llhttp_settings_init(FFI::addr($settings));
-        
+
         // For now, we'll implement a simple approach without C callbacks
         // This is a limitation of the current FFI implementation
     }

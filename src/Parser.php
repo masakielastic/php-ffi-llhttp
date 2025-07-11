@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Llhttp;
+namespace Llhttp\Ffi;
 
 use FFI\CData;
 use Llhttp\Ffi\Binding;
@@ -28,7 +28,7 @@ class Parser
     private array $collectedHeaders = [];
     private ?string $currentHeaderField = null;
     private ?string $currentHeaderValue = null;
-    
+
     /** @var array<string, callable> */
     private array $callbacks = [];
 
@@ -41,7 +41,7 @@ class Parser
         $this->type = $type;
         $this->binding = Binding::getInstance($libraryPath);
         $this->callbackManager = new CallbackManager($this->binding->getFfi());
-        
+
         $this->initializeParser();
         $this->setupInternalCallbacks();
     }
@@ -75,12 +75,12 @@ class Parser
         }
 
         $result = $this->binding->execute($this->parser, $data);
-        
+
         // Check for parser errors
         if ($result !== ErrorCodes::HPE_OK) {
             $this->handleParseError($result);
         }
-        
+
         // Manually trigger callbacks after successful parsing
         $this->triggerManualCallbacks();
     }
@@ -95,7 +95,7 @@ class Parser
         }
 
         $result = $this->binding->finish($this->parser);
-        
+
         if ($result !== ErrorCodes::HPE_OK) {
             $this->handleParseError($result);
         }
@@ -221,10 +221,10 @@ class Parser
     {
         $this->parser = $this->binding->createParser();
         $this->settings = $this->binding->createSettings();
-        
+
         $this->callbackManager->setupSettings($this->settings);
         $this->binding->initParser($this->parser, $this->type, $this->settings);
-        
+
         $this->initialized = true;
     }
 
@@ -240,7 +240,7 @@ class Parser
                 $this->addHeader($this->currentHeaderField, $this->currentHeaderValue);
                 $this->currentHeaderValue = null;
             }
-            
+
             // Start new header field or continue existing one
             if ($this->currentHeaderField === null) {
                 $this->currentHeaderField = $data;
@@ -264,7 +264,7 @@ class Parser
             if ($this->currentHeaderField !== null && $this->currentHeaderValue !== null) {
                 $this->addHeader($this->currentHeaderField, $this->currentHeaderValue);
             }
-            
+
             $this->currentHeaderField = null;
             $this->currentHeaderValue = null;
         });
@@ -276,7 +276,7 @@ class Parser
     private function addHeader(string $name, string $value): void
     {
         $name = strtolower($name);
-        
+
         if (isset($this->collectedHeaders[$name])) {
             // Convert to array if not already
             if (!is_array($this->collectedHeaders[$name])) {
@@ -297,19 +297,19 @@ class Parser
         if (isset($this->callbacks[Events::MESSAGE_BEGIN])) {
             ($this->callbacks[Events::MESSAGE_BEGIN])();
         }
-        
+
         // Trigger URL callback if available
         if (isset($this->callbacks[Events::URL])) {
             // Try to extract URL from parser state
             // For now, use a placeholder
             ($this->callbacks[Events::URL])('/api/users');
         }
-        
+
         // Trigger headers complete
         if (isset($this->callbacks[Events::HEADERS_COMPLETE])) {
             ($this->callbacks[Events::HEADERS_COMPLETE])();
         }
-        
+
         // Trigger message complete
         if (isset($this->callbacks[Events::MESSAGE_COMPLETE])) {
             ($this->callbacks[Events::MESSAGE_COMPLETE])();
@@ -323,7 +323,7 @@ class Parser
     {
         $errorMessage = ErrorCodes::getMessage($errorCode);
         $errorReason = $this->binding->getErrorReason($this->parser);
-        
+
         $message = $errorMessage;
         if ($errorReason !== null) {
             $message .= ': ' . $errorReason;
